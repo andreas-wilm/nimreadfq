@@ -1,6 +1,6 @@
 import os
 
-import kseq
+import readfq
 
 when isMainModule:
   let args = commandLineParams()

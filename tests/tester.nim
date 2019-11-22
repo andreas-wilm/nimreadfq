@@ -2,7 +2,7 @@ import unittest
 import md5
 import strutils
 
-import ../kseq
+import ../readfq
 
 
 test "readfq test.fasta.gz":
