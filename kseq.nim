@@ -2,7 +2,6 @@ import zip/zlib
 
 # https://forum.nim-lang.org/t/2668
 from os import splitPath
-
 const kseqh = currentSourcePath().splitPath.head & "/kseq/kseq.h"
 
 
@@ -23,12 +22,17 @@ type
     last_char: int
     f: ptr kstream_t
   gzFile = pointer
-  # convenience type for fastq or fasta records
-  FQRecord* = object
+  # convenience type for FastQ or Fasta records
+  FQRecordPtr* = object
     name*: ptr char
     comment*: ptr char# optional
     sequence*: ptr char
     quality*: ptr char# optional
+  FQRecord* = object
+    name*: string
+    comment*: string# optional
+    sequence*: string
+    quality*: string# optional
 
 
 proc kseq_init*(fp: gzFile): ptr kseq_t {.header: kseqh, importc: "kseq_init".}
@@ -40,9 +44,9 @@ proc kseq_rewind*(seq: ptr kseq_t) {.header: kseqh, importc: "kseq_rewind".}
 proc kseq_read*(seq: ptr kseq_t): int {.header: kseqh, importc: "kseq_read".}
 
 
-iterator readfq*(fp: GzFile): FQRecord =
+iterator readFQPtr*(fp: GzFile): FQRecordPtr =
   # NOTE: ptr char will be reused on next iteration
-  var result: FQRecord# not implicit in iterators
+  var result: FQRecordPtr# 'result' not implicit in iterators
   doAssert fp != nil
   let rec = kseq_init(fp)
   while true:
@@ -55,19 +59,34 @@ iterator readfq*(fp: GzFile): FQRecord =
     yield result
 
 
-proc `$`*(rec: FQRecord): string =
+iterator readFQ*(fp: GzFile): FQRecord =
+  var result: FQRecord# 'result' not implicit in iterators
+  for rec in readFQPtr(fp):
+    result.name = $rec.name
+    result.comment = $rec.comment
+    result.sequence = $rec.sequence
+    result.quality = $rec.quality
+    yield result
+
+
+proc fqfmt(name: string, comment: string, sequence: string, quality: string): string =
   var fastq = false
   var header = ">"
-  if len($rec.quality) > 0:
+  if len(quality) > 0:
     fastq = true
     header = "@"
-
-  result = header & $rec.name
-  if $rec.comment != "":
-    result = result & " " & $rec.comment
-  result = result & "\n" & $rec.sequence
+  result = header & name
+  if comment != "":
+    result = result & " " & comment
+  result = result & "\n" & sequence
   if fastq:
-    result = result & "\n+\n" & $rec.quality
+    result = result & "\n+\n" & quality
 
 
-# FIXME add optional functions and type that provide string copy of ptr char?
+proc `$`*(rec: FQRecord): string =
+  return fqfmt(rec.name, rec.comment, rec.sequence, rec.quality)
+
+
+proc `$`*(rec: FQRecordPtr): string =
+  return fqfmt($rec.name, $rec.comment, $rec.sequence, $rec.quality)
+
