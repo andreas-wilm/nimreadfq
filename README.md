@@ -27,6 +27,7 @@ Flat file FastQ:
 - fastx: 6.486s
 
 How to reproduce results:
+
     cd ./benchmark
     nimble build
     ./benchmark
