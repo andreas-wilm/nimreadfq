@@ -44,9 +44,17 @@ proc kseq_rewind*(seq: ptr kseq_t) {.header: kseqh, importc: "kseq_rewind".}
 proc kseq_read*(seq: ptr kseq_t): int {.header: kseqh, importc: "kseq_read".}
 
 
-iterator readFQPtr*(fp: GzFile): FQRecordPtr =
-  # NOTE: ptr char will be reused on next iteration
+iterator readFQPtr*(path: string): FQRecordPtr =
+  # - ptr char will be reused on next iteration
+  # - for stdin use "-" as path
+  # - gz[d]open default even for flat file format
   var result: FQRecordPtr# 'result' not implicit in iterators
+  var fp: GzFile
+  if path == "-":
+    fp = gzdopen(0, "r")
+  else:
+    fp = gzopen(path, "r")
+
   doAssert fp != nil
   let rec = kseq_init(fp)
   while true:
@@ -57,11 +65,12 @@ iterator readFQPtr*(fp: GzFile): FQRecordPtr =
     result.sequence = rec.seq.s
     result.quality = rec.qual.s
     yield result
+  discard gzclose(fp)
 
 
-iterator readFQ*(fp: GzFile): FQRecord =
+iterator readFQ*(path: string): FQRecord =
   var result: FQRecord# 'result' not implicit in iterators
-  for rec in readFQPtr(fp):
+  for rec in readFQPtr(path):
     result.name = $rec.name
     result.comment = $rec.comment
     result.sequence = $rec.sequence

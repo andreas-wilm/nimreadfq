@@ -1,0 +1,2 @@
+Compile with `nim c -l:-lz example.nim`
+Run as follows: ./example fa_or_fq
