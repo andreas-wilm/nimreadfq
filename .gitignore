@@ -2,3 +2,4 @@ nimcache/
 *un~
 tests/tester
 example
+benchmark/benchmark
