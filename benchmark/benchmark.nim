@@ -6,6 +6,7 @@ import zip/gzipfiles
 import ../readfq
 import nimbioseq
 import fastx_reader
+import klib
 
 
 # https://stackoverflow.com/questions/36577570/how-to-benchmark-few-lines-of-code-in-nim
@@ -22,12 +23,18 @@ proc readfq_count(path: string): int =
   for rec in readfq.readfq(path):
     inc result
 
-
 proc readFastq_count(path: string): int =
   var i = 0
   for rec in readfastq(path):
     inc result
 
+proc klib_count(path: string): int =
+  var r: FastxRecord
+  var n = 0
+  var f = xopen[klib.GzFile](path)
+  defer: f.close()
+  while f.readFastx(r):
+    inc result
 
 proc fastq_reader_count(path: string): int =
   for name, sequence, quality in fastq_reader(open(path)):
@@ -41,6 +48,9 @@ when isMainModule:
   benchmark "readfq count":
     echo "n=" & $readfq_count(fq)
 
+  benchmark "klib count":
+    echo "n=" & $klib_count(fq)
+
   benchmark "bioseq count":
     echo "n=" & $readFastq_count(fq)
 
@@ -52,6 +62,9 @@ when isMainModule:
 
   benchmark "readfq gz count":
     echo "n=" & $readfq_count(fqgz)
+
+  benchmark "klib gz count":
+    echo "n=" & $klib_count(fqgz)
 
   benchmark "bioseq gz count":
     echo "n=" & $readFastq_count(fqgz)
