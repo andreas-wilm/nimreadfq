@@ -19,8 +19,12 @@ template benchmark(benchmarkName: string, code: untyped) =
     echo "CPU Time [", benchmarkName, "] ", elapsedStr, "s"
 
 
+proc readfqPtr_count(path: string): int =
+  for rec in readfq.readFQPtr(path):
+    inc result
+
 proc readfq_count(path: string): int =
-  for rec in readfq.readfq(path):
+  for rec in readfq.readFQ(path):
     inc result
 
 proc readFastq_count(path: string): int =
@@ -47,6 +51,9 @@ when isMainModule:
 
   benchmark "readfq count":
     echo "n=" & $readfq_count(fq)
+
+  benchmark "readfqPtr count":
+    echo "n=" & $readfqptr_count(fq)
 
   benchmark "klib count":
     echo "n=" & $klib_count(fq)

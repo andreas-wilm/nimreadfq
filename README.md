@@ -1,6 +1,7 @@
 # Note
 
-This repository was started before Heng Li wrote his article ["Fast high-level programming languages"](https://lh3.github.io/2020/05/17/fast-high-level-programming-languages), which contains a native Nim implementation (see klib below). His native Nim implementation is very fast out of the box and should in fact be used instead of this implementation.
+This repository was started before Heng Li wrote his article ["Fast high-level programming languages"](https://lh3.github.io/2020/05/17/fast-high-level-programming-languages), which contains a native Nim implementation (see klib below), which is just as fast as the implementation here (depending on whether you reuse memory or not) and could simply be used instead.
+
 
 # nimreadfq
 
@@ -23,17 +24,16 @@ repo](https://github.com/tanghaibao/bio-pipeline/). Haibao generously [granted f
 nimreadfq is significantly faster than packages with similar functionality. Below are example timings for reading 5,682,010 sequences from `M_abscessus_HiSeq.fq` ([source; see also `./benchmark/get_fq.sh`](https://github.com/lh3/biofast/releases/tag/biofast-data-v1)) run on my MacBook Pro 2019:
 
 fastq:
-- readfq: 10.4s
-- klib: 7.5
-- fastx: 41.1s
-- bioseq: 44.3s
+- readfqPtr: 2.3s
+- klib: 7.0s
+- readfq: 7.6s
+- fastx: 39.6s
+- bioseq: 42.1s
 
 fastq.gz:
-- klib gz: 14.8s
-- readfq gz: 17.6s
-- fastx: NA
-- bioseq gz: 145.6s
-
+- readfq gz: 15.6s
+- klib gz: 15.8s
+- bioseq gz: 150.0s
 
 How to reproduce results:
 
