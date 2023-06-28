@@ -35,24 +35,24 @@ proc fastq_reader_count(path: string): int =
 
 
 when isMainModule:
-  var path = "SRR8616947_1.500k.fastq.gz"
-
-  benchmark "readfq gz count":
-    echo "n=" & $readfq_count(path)
-
-  benchmark "bioseq gz count":
-    echo "n=" & $readFastq_count(path)
-
-
-  path = "SRR8616947_1.500k.fastq"
+  # see https://github.com/lh3/biofast/releases/tag/biofast-data-v1)
+  var fq = "./M_abscessus_HiSeq.fq"
 
   benchmark "readfq count":
-    echo "n=" & $readfq_count(path)
+    echo "n=" & $readfq_count(fq)
 
   benchmark "bioseq count":
-    echo "n=" & $readFastq_count(path)
+    echo "n=" & $readFastq_count(fq)
 
   benchmark "fastx count":
-    echo "n=" & $fastq_reader_count(path)
+    echo "n=" & $fastq_reader_count(fq)
 
+  # see https://github.com/lh3/biofast/releases/tag/biofast-data-v1)
+  var fqgz = "./M_abscessus_HiSeq.fq.gz"
+
+  benchmark "readfq gz count":
+    echo "n=" & $readfq_count(fqgz)
+
+  benchmark "bioseq gz count":
+    echo "n=" & $readFastq_count(fqgz)
 
